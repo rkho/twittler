@@ -16,14 +16,51 @@
         var $tweets = $('.tweets');
         $tweets.html('');
 
-        var index = streams.home.length - 1;
-        while(index >= 0){
-          var tweet = streams.home[index];
-          var $tweet = $('<div></div>');
-          $tweet.text('@' + tweet.user + ': ' + tweet.message);
-          $tweet.prependTo($tweets);
-          index -= 1;
+        var tweetFetcher = function(){
+          var index = 0;
+          while(index >= 0 && index < 100){
+            var tweet = streams.home[index];
+            var $tweet = $('<li class="message"></li>');
+            $tweet.text('@' + tweet.user + ': ' + tweet.message);
+            $tweet.prependTo($tweets);
+            index++;
+          }
+          if (index = 100){
+            streams.home[index]
+          }
         }
+
+/*
+        var tweetFetcher = function(){
+          var index = 0;
+          while(index >= 0 && index < 100){
+            var tweet = streams.home[index];
+            var $tweet = $('<div class="modal fade">
+                            <div class="modal-dialog">
+                              <div class="modal-content">
+                                <div class="modal-header">
+                                  <h4 class="modal-title">tweet.user</h4>
+                                    </div>
+                                  <div class="modal-body">
+                                    <p>tweet.message</p>
+                                  </div>
+                                  <div class="modal-footer">
+                                    <p>Time sent</p>
+                                  </div>
+                              </div>
+                            </div>
+                          </div>')
+            $tweet.prependTo($tweets);
+          }
+        }
+*/
+        var intervalFetch = function(){
+          setInterval(function(){
+            tweetFetcher();
+          }, 3000)
+        };
+
+        intervalFetch();
 
       });
     </script>

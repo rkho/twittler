@@ -1,4 +1,11 @@
-.navbar-logo {
-  display: block;
-  margin: 0 auto 0 auto;
+.logo {
+  width: 30px;
+}
+
+.mainTitle {
+  color: #55ACEE;
+}
+
+.tagline {
+  color: #292F33;
 }

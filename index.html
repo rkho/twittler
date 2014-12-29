@@ -20,13 +20,10 @@
           var index = 0;
           while(index >= 0 && index < 100){
             var tweet = streams.home[index];
-            var $tweet = $('<li class="message"></li>');
+            var $tweet = $('<div class="well"></li>');
             $tweet.text('@' + tweet.user + ': ' + tweet.message);
             $tweet.prependTo($tweets);
             index++;
-          }
-          if (index = 100){
-            streams.home[index]
           }
         }
 

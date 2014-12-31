@@ -4,7 +4,7 @@
     <script src="jquery.js"></script>
     <script src="data_generator.js"></script>
     <script src="js/bootstrap.js"></script>
-    <script src="jquerytimeago.js"></script>
+    <script src="jquery.timeago.js"></script>
     <link type="type/css" rel="stylesheet" href="css/bootstrap.css">
     <link type="type/css" rel="stylesheet" href="styles.css">
 
@@ -13,77 +13,126 @@
     <script>
 
       $(document).ready(function(){
-        var $tweets = $('.tweets');
-        $tweets.html('');
-
-        var tweetFetcher = function(){
+        var fetchNewTweets = function(){
           var index = 0;
-          while(index >= 0 && index < 100){
+          while(index >= 0){
             var tweet = streams.home[index];
-            var $tweet = $('<div class="well"></li>');
-            $tweet.text('@' + tweet.user + ': ' + tweet.message);
-            $tweet.prependTo($tweets);
+            var timeCreated = jQuery.timeago(tweet.created_at)
+            var $oneTweet = $('<div class="list-group"></div>');
+            var $tweetSender = $('<h4 class="list-group-item-heading"></h4>')
+            var $tweetMessage = $('<h4 class="list-group-item-text"></h4>')
+            $tweetSender.append('<a type="button" data-toggle="modal" href="#userTweets" data-username=' + '"' + tweet.user + '"' + '>' + '@' + tweet.user + '</a>' + ' ' + timeCreated);
+            $tweetMessage.text(tweet.message);
+            $tweetSender.appendTo($oneTweet);
+            $tweetMessage.appendTo($oneTweet);
+            $oneTweet.hide().prependTo('.tweetstream').slideDown(400);
             index++;
           }
         }
 
-/*
-        var tweetFetcher = function(){
-          var index = 0;
-          while(index >= 0 && index < 100){
-            var tweet = streams.home[index];
-            var $tweet = $('<div class="modal fade">
-                            <div class="modal-dialog">
-                              <div class="modal-content">
-                                <div class="modal-header">
-                                  <h4 class="modal-title">tweet.user</h4>
-                                    </div>
-                                  <div class="modal-body">
-                                    <p>tweet.message</p>
-                                  </div>
-                                  <div class="modal-footer">
-                                    <p>Time sent</p>
-                                  </div>
-                              </div>
-                            </div>
-                          </div>')
-            $tweet.prependTo($tweets);
-          }
-        }
-*/
-        var intervalFetch = function(){
+
+          $('#userTweets').on('show.bs.modal', function (event) {           
+
+            var button = $(event.relatedTarget) // Button that triggered the modal
+            var username = button.data('username') //
+            var userStream = streams.users[username] //> streams.users.username
+            var userIndex = userStream.length-1
+            var modal = $(this)
+            var $listOfTweets = $('<div class="listOfTweets"></div>')
+
+            while(userIndex > 0){
+              var tweet = userStream[userIndex];
+              var timeCreated = jQuery.timeago(tweet.created_at);
+              
+              var $tweetSender = $('<div class="tweet-header"></div>')
+              $tweetSender.append('<a>@'+ username+ "</a>" + " " + timeCreated);
+              var $tweet = $('<p class="tweet-text"></p>');
+              $tweet.html(tweet.message);
+              $tweetSender.appendTo($listOfTweets);
+              $tweet.appendTo($listOfTweets);
+              userIndex -= 1;
+            }
+
+            modal.find('.modal-title').html("<a href='#'>"+"@"+username+"</a>" + " - Latest Activity")
+            modal.find('.modal-body').html($listOfTweets)
+                       
+          })      
+
+        var fetchAtInterval = function(){
           setInterval(function(){
-            tweetFetcher();
-          }, 3000)
+            fetchNewTweets();
+          }, 6000)
         };
 
-        intervalFetch();
+        fetchAtInterval();
 
       });
     </script>
 
-<nav class="navbar navbar-default">
-  <div class="container-fluid">
-    <!-- Brand and toggle get grouped for better mobile display -->
-    <div class="navbar-header">
-      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-        <span class="sr-only">Toggle navigation</span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
+<div class="navbar navbar-default">
+  <div class="navbar-header">
+    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+    </button>
       <a class="navbar-brand" href="index.html"><img class="logo" alt="Twittler" src="images/Twitter_logo_blue.png"></a>
-    </div>
-  </div><!-- /.container-fluid -->
-</nav>
-
-<div class="stream">
-  <div class="container">
-    <h1 class="mainTitle">Tweet Stream</h1>
-    <p class="tagline">Discover what's happening.</p>
-    <ul class="tweets"></ul>
   </div>
 </div>
+
+<div class="container">
+  <div class="col-md-4">
+    <h1 class="siteName">Twittler</h1>
+    <form class="form-horizontal">
+  <fieldset>
+    <legend>Join the Discussion.</legend>
+    <div class="form-group">
+      <label for="inputHandle" class="col-lg-2 control-label">Name</label>
+      <div class="col-lg-10">
+        <input type="text" class="form-control" id="inputHandle" placeholder="@">
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="textArea" class="col-lg-2 control-label">Message</label>
+      <div class="col-lg-10">
+        <textarea class="form-control" rows="3" id="textArea" placeholder="What's Happening?"></textarea>
+        <span class="help-block">140 Characters</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <div class="col-lg-10 col-lg-offset-2">
+        <button class="btn btn-default">Clear</button>
+        <button type="submit" class="btn btn-primary">Tweet</button>
+      </div>
+    </div>
+  </fieldset>
+</form>
+    <div class="nowViewing">
+    </div>
+    </div>
+    <div class="col-md-8">
+      <h1 class="mainTitle">Stream</h1>
+      <p class="tagline"></p>
+      <div class="tweetstream">
+      </div>
+    </div>
+</div>
+
+    <div class="modal fade" id="userTweets" tabindex="-1" role="dialog" aria-labelledby="userTweetsLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            <h4 class="modal-title" id="userTweetsLabel">Modal title</h4>
+          </div>
+          <div class="modal-body">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
 </div>
   </body>
